@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fd-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fd-nginx
+  template:
+    metadata:
+      labels:
+        app: fd-nginx
+    spec:
+      containers:
+        - name: fd-nginx
+          image: innaxn/foody-ingress:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+       #   env:
+       #   - name: JC_FRONTEND_HOST
+       #     value: jc-frontend.default.svc.cluster.local:3000
+       #   - name: JC_COMMS_HOST
+        #    value: jc-comms-server.default.svc.cluster.local
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fd-nginx
+spec:
+  selector:
+    app: fd-nginx
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 443 
+  type: LoadBalancer
